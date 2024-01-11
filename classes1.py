@@ -12,7 +12,7 @@ class Elevator:
         self.min_requested_floor = max_possible_floor
         self.requested_floors = []
         self.chosen_floors = []
-        self.state = "standing"
+        self.state = "STANDING"
         self.people_inside_arr = []
         self.heading_to = None
         self.delay = 0
@@ -30,6 +30,14 @@ class Elevator:
 
     def update_people_inside(self):
         self.people_inside_int = len(self.people_inside_arr)
+        arr = []
+        for person in self.people_inside_arr:
+            arr.append(person.desired_floor)
+            if person.desired_floor not in self.chosen_floors:
+                self.add_floor_to_chosen_queue(person.desired_floor)
+        for chosen_floor in self.chosen_floors:
+            if chosen_floor not in arr:
+                self.remove_floor_from_chosen(chosen_floor)
 
     def move_elevator(self, new_requested_floor):
         if 1 <= new_requested_floor <= self.max_possible_floor:
@@ -45,17 +53,35 @@ class Elevator:
             #  chosen floor is incorrect
             print("Podano nieprawidłowe piętro.")
 
-    def move_elevator_up(self):
-        self.state = "going_up"
+    def state_up(self):
+        self.state = "UP"
 
-    def move_elevator_down(self):
-        self.state = "going_down"
+    def state_down(self):
+        self.state = "DOWN"
+
+    def state_none(self):
+        self.state = "STANDING"
+
+    def change_direction(self):
+        if self.state == "UP":
+            self.state_down()
+        elif self.state == "DOWN":
+            self.state_up()
 
     def add_floor_to_requested_queue(self, new_floor):
-        self.requested_floors.append(new_floor)
+        if new_floor not in self.requested_floors:
+            self.requested_floors.append(new_floor)
+
+    def remove_floor_from_requested(self, floor):
+        if floor in self.requested_floors:
+            self.requested_floors.remove(floor)
 
     def add_floor_to_chosen_queue(self, new_floor):
         self.chosen_floors.append(new_floor)
+
+    def remove_floor_from_chosen(self, floor):
+        if floor in self.chosen_floors:
+            self.chosen_floors.remove(floor)
 
     def decide_if_stop(self):
         if self.current_floor in self.requested_floors:
@@ -81,6 +107,26 @@ class Elevator:
 
     def how_much_space_left(self):
         return self.max_people_inside - self.people_inside_int
+
+    def requested_chosen_floors_above(self):
+        above = []
+        for requested_floor in self.requested_floors:
+            if requested_floor > self.current_floor:
+                above.append(requested_floor)
+        for chosen_floor in self.chosen_floors:
+            if chosen_floor > self.current_floor:
+                above.append(chosen_floor)
+        return above
+
+    def requested_chosen_floors_below(self):
+        below = []
+        for requested_floor in self.requested_floors:
+            if requested_floor < self.current_floor:
+                below.append(requested_floor)
+        for chosen_floor in self.chosen_floors:
+            if chosen_floor < self.current_floor:
+                below.append(chosen_floor)
+        return below
 
 
 class Person:

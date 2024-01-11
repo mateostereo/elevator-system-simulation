@@ -1,6 +1,7 @@
 import pygame
 import sys
-from operator1 import operator, people_array, max_floor, winda, floor_down, floor_up
+from operator1 import operator, people_array, max_floor, winda, floor_down, floor_up, passengers_at_dest
+from numpy import mean
 
 # Pygame setup
 pygame.init()
@@ -80,10 +81,10 @@ def main():
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_DOWN]:
             floor_up(winda)
 
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_UP]:
             floor_down(winda)
 
         operator()
@@ -98,6 +99,10 @@ def main():
         draw_elevator(winda.current_floor)
 
         draw_chosen_floors(winda.chosen_floors)
+
+        waiting_times = []
+        for waiting_time in passengers_at_dest:
+            waiting_times.append(waiting_time.wait_time)
 
         pygame.display.flip()
         clock.tick(FPS)
