@@ -1,6 +1,7 @@
 import pygame
 import sys
 from operator1 import operator, people_array, max_floor, winda, floor_down, floor_up, passengers_at_dest
+from classes1 import Person
 from numpy import mean
 
 # Pygame setup
@@ -12,12 +13,13 @@ FLOOR_HEIGHT = HEIGHT // (max_floor + 1)
 CIRCLE_RADIUS = 15
 ELEVATOR_WIDTH = 40
 ELEVATOR_HEIGHT = FLOOR_HEIGHT - 10
-FPS = 6
+FPS = 5
 
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+YELLOW = (255, 255, 0)
 
 # Initialize Pygame screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -100,12 +102,13 @@ def main():
 
         draw_chosen_floors(winda.chosen_floors)
 
-        waiting_times = []
-        for waiting_time in passengers_at_dest:
-            waiting_times.append(waiting_time.wait_time)
-
         pygame.display.flip()
         clock.tick(FPS)
+
+    waiting_times = []
+    for waiting_time in passengers_at_dest:
+        waiting_times.append(waiting_time.wait_time)
+    print(mean(waiting_times))
 
 
 if __name__ == "__main__":

@@ -8,13 +8,11 @@ class Elevator:
         self.max_people_inside = max_people_inside
         self.max_possible_floor = max_possible_floor
 
-        self.max_requested_floor = 0
-        self.min_requested_floor = max_possible_floor
         self.requested_floors = []
         self.chosen_floors = []
+        self.queue = None  # fully managed by operator
         self.state = "STANDING"
         self.people_inside_arr = []
-        self.heading_to = None
         self.delay = 0
 
     def enter(self, people_entering_arr):
@@ -38,20 +36,6 @@ class Elevator:
         for chosen_floor in self.chosen_floors:
             if chosen_floor not in arr:
                 self.remove_floor_from_chosen(chosen_floor)
-
-    def move_elevator(self, new_requested_floor):
-        if 1 <= new_requested_floor <= self.max_possible_floor:
-            #  the chosen floor is correct
-            if new_requested_floor > self.current_floor:
-                self.move_elevator_up()
-            elif new_requested_floor < self.current_floor:
-                self.move_elevator_down()
-            self.add_floor_to_requested_queue(new_requested_floor)
-            #  in case the elevator already is on the requested floor
-            self.decide_if_stop()
-        else:
-            #  chosen floor is incorrect
-            print("Podano nieprawidłowe piętro.")
 
     def state_up(self):
         self.state = "UP"

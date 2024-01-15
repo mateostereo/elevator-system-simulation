@@ -9,10 +9,11 @@ max_people_floor = 10
 people_array = np.full((max_floor + 1, max_people_floor), None, dtype=object)  # macierzowa reprezentacja pięter
 winda = Elevator(5, max_floor)
 passengers_at_dest = []
+delay_tick = 2
 
 
 def generate_passengers():
-    amount = random.randint(0, 1)  # od 0 do 3 pasażerów
+    amount = random.randint(0, 3)  # od 0 do 3 pasażerów
     new_floors_arr = []
     for person in range(amount):
         person = Person(max_floor)
@@ -75,18 +76,17 @@ def manage_requests(current_floor, elevator):
 
 def floor_up(elevator):
     elevator.increase_floor()
+    winda.delay += delay_tick
 
 
 def floor_down(elevator):
     elevator.decrease_floor()
+    winda.delay += delay_tick
 
 
 def find_minimal(elevator):
     chosen_floors = elevator.chosen_floors
     requested_floors = elevator.requested_floors
-
-    print("Chosen Floors:", chosen_floors)
-    print("Requested Floors:", requested_floors)
 
     if not chosen_floors and not requested_floors:
         return 0
@@ -97,9 +97,6 @@ def find_minimal(elevator):
 def find_maximal(elevator):
     chosen_floors = elevator.chosen_floors
     requested_floors = elevator.requested_floors
-
-    print("Chosen Floors:", chosen_floors)
-    print("Requested Floors:", requested_floors)
 
     if not chosen_floors and not requested_floors:
         return 99999
@@ -117,9 +114,6 @@ def increase_personal_counter(elevator, step=1):
 
 
 def operator():
-    if winda.delay > 0:
-        # zmniejszanie delay tu!!!!!
-        return 0
     current_floor = winda.current_floor
     current_state = winda.state
     requested_floors = winda.requested_floors
@@ -136,50 +130,58 @@ def operator():
     manage_requests(current_floor, winda)
 
     # ----- podejmowanie decyzji o ruchu windy
-    minimal = find_minimal(winda)
-    maximal = find_maximal(winda)
+    if winda.delay == 0:    # sprawdzenie, czy opóźnienie dobiegło końca
 
-    print("min: ", minimal)
-    print("max: ", maximal)
+        minimal = find_minimal(winda)
+        maximal = find_maximal(winda)
 
-    requested_floors_above = winda.requested_chosen_floors_above()
-    requested_floors_below = winda.requested_chosen_floors_below()
+        requested_floors_above = winda.requested_chosen_floors_above()
+        requested_floors_below = winda.requested_chosen_floors_below()
 
-    current_floor = winda.current_floor
+        current_floor = winda.current_floor
 
-    if winda.state == "STANDING":
-        if minimal > current_floor:
-            winda.state = "UP"
-        elif maximal < current_floor:
-            winda.state = "DOWN"
-        elif requested_floors_above or requested_floors_below:
-            winda.state = "UP"  # Start moving up even in a standing state
+        if not requested_floors_above and not requested_floors_below:
+            winda.state = "STANDING"
 
-    elif winda.state == "UP":
-        if minimal > current_floor:
-            floor_up(winda)
-        elif not requested_floors_above:
-            winda.change_direction()
-            if requested_floors_below:
-                winda.state = "DOWN"
-
-    elif winda.state == "DOWN":
-        if maximal < current_floor:
-            floor_down(winda)
-        elif not requested_floors_below:
-            winda.change_direction()
-            if requested_floors_above:
+        if winda.state == "STANDING":  # theres still a chance of a bug when elevator is standing
+            if minimal > current_floor:
                 winda.state = "UP"
+                floor_up(winda)
+            elif maximal < current_floor:
+                winda.state = "DOWN"
+                floor_down(winda)
+            elif requested_floors_above or requested_floors_below:
+                winda.state = "UP"  # Start moving up even in a standing state
 
-    print("state: ", winda.state)
+        elif winda.state == "UP":
+            if minimal > current_floor:
+                floor_up(winda)
+            elif not requested_floors_above:
+                if requested_floors_below:
+                    winda.state = "DOWN"
+                    floor_down(winda)
+            else:
+                floor_up(winda)
 
-    # ----- sprawdź czy otworzyć drzwi windy -----
-    if winda.decide_if_stop():
-        visiting_floor(winda.current_floor, winda)
+        elif winda.state == "DOWN":
+            if maximal < current_floor:
+                floor_down(winda)
+            elif not requested_floors_below:
+                if requested_floors_above:
+                    winda.state = "UP"
+                    floor_up(winda)
+            else:
+                floor_down(winda)
 
-    manage_requests(current_floor, winda)
+        # ----- sprawdź czy otworzyć drzwi windy -----
+        if winda.decide_if_stop():
+            visiting_floor(winda.current_floor, winda)
+
+        manage_requests(current_floor, winda)
 
     # ----- zwiększanie czasu oczekiwania wszystkich osób w systemie -----
     increase_personal_counter(winda)
 
-    time.sleep(0.1)
+    if winda.delay > 0:
+        winda.delay -= 1
+    ##  time.sleep(0.1)
