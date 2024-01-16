@@ -1,6 +1,42 @@
 import random
 
 
+class ElevatorSystem:
+    def __init__(self, max_possible_floor):
+        self.max_possible_floor = max_possible_floor
+        self.requested_floors = []
+
+    def add_floor_to_requested_queue(self, new_floor):
+        if new_floor not in self.requested_floors:
+            self.requested_floors.append(new_floor)
+
+    def remove_floor_from_requested(self, floor):
+        if floor in self.requested_floors:
+            self.requested_floors.remove(floor)
+
+    def requested_chosen_floors_above(self, elevator):
+        current_floor = elevator.current_floor
+        above = []
+        for requested_floor in self.requested_floors:
+            if requested_floor > current_floor:
+                above.append(requested_floor)
+        for chosen_floor in elevator.chosen_floors:
+            if chosen_floor > current_floor:
+                above.append(chosen_floor)
+        return above
+
+    def requested_chosen_floors_below(self, elevator):
+        current_floor = elevator.current_floor
+        below = []
+        for requested_floor in self.requested_floors:
+            if requested_floor < current_floor:
+                below.append(requested_floor)
+        for chosen_floor in elevator.chosen_floors:
+            if chosen_floor < current_floor:
+                below.append(chosen_floor)
+        return below
+
+
 class Elevator:
     def __init__(self, max_people_inside, max_possible_floor):
         self.current_floor = 0
@@ -67,9 +103,13 @@ class Elevator:
         if floor in self.chosen_floors:
             self.chosen_floors.remove(floor)
 
-    def decide_if_stop(self):
-        if self.current_floor in self.requested_floors:
-            return True
+    def decide_if_stop(self, elevator_system=None):
+        if elevator_system is None:
+            if self.current_floor in self.requested_floors:
+                return True
+        else:
+            if self.current_floor in elevator_system.requested_floors:
+                return True
         if self.current_floor in self.chosen_floors:
             return True
         return False
