@@ -1,13 +1,13 @@
-from operator1 import operator
-import operator1
-from classes1 import Elevator
+from operator2 import operator
+import operator2
+from classes1 import Elevator, ElevatorSystem
 from numpy import mean, arange
-import random
 import importlib
 import numpy as np
+import random
 
 """
-Plik iteration1 obsługuje procedowanie symulacji dla pliku operator1
+Plik iteration2 obsługuje procedowanie symulacji dla pliku operator2
 """
 
 simulation_time = 50000
@@ -49,11 +49,11 @@ def count_people_elevators(array_elevators):
 def iteration(parameters):
     for step in range(simulation_time):
         parameters = operator(max_floor, spawn_chance, max_people_floor,
-                              people_array, winda, elevators, passengers_at_dest,
-                              opening_door_delay)
+                              people_array, winda, winda2, elevators, passengers_at_dest,
+                              opening_door_delay, elevator_system)
         arr_count_people_outside.append(count_people_outside(people_array))
         arr_count_people_inside.append(count_people_elevators(elevators))
-    importlib.reload(operator1)
+    importlib.reload(operator2)
 
 
 def run_outside(parameters):
@@ -67,16 +67,7 @@ def run_outside(parameters):
 
 
 if __name__ == "__main__":
-    max_floor = 8
-    spawn_chance = 25
-    max_people_floor = 10
-    people_array = np.full((max_floor + 1, max_people_floor), None, dtype=object)  # macierzowa reprezentacja pięter
-    winda = Elevator(5, max_floor, speed=random.randint(7, 13))
-    elevators = [winda]
-    passengers_at_dest = []
-    opening_door_delay = 5
-    parameters = (max_floor, spawn_chance, max_people_floor, people_array, winda, elevators,
-                  passengers_at_dest, opening_door_delay)
+
     iteration(parameters)
     waiting_times = []
     for waiting_time in passengers_at_dest:

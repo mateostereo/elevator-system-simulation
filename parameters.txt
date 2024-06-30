@@ -1,0 +1,18 @@
+Parametry wejściowe:
+— wielkość i wytrzymałość windy (ile osób maksymalnie może wejść)
+— prędkość windy
+— czas otwierania i zamykania drzwi
+—
+
+Parametry systemu:
+— liczba pięter
+— warunki pojawiania się pasażerów (w oparciu o rozkład płaski)
+— liczba wind: 2
+
+Parametry wyjściowe:
+— czas, który zajął pasażerowi na dotarcie do miejsca docelowego od czasu wygenerowania
+
+
+Dla określonej ilosci krokow x 30 jedna winda
+
+dla tej samej ilosci krokow x 30 dwie windy (rozne szybkosci (random))

@@ -1,8 +1,28 @@
 import pygame
 import sys
-from operator2 import operator, people_array, max_floor, winda, winda2, floor_down, floor_up, passengers_at_dest, \
-    elevator_system
+from classes1 import Elevator, ElevatorSystem
+from operator2 import operator
 from numpy import mean
+import numpy as np
+import random
+
+"""
+Plik służący do wizualizacji symulacji. 
+"""
+
+# ------- parameters --------
+max_floor = 8
+spawn_chance = 25
+max_people_floor = 10
+people_array = np.full((max_floor + 1, max_people_floor), None, dtype=object)  # macierzowa reprezentacja pięter
+winda = Elevator(5, max_floor, starting_floor=5, speed=random.randint(7, 13))
+winda2 = Elevator(5, max_floor, speed=random.randint(7, 13))
+elevators = [winda, winda2]
+passengers_at_dest = []
+opening_door_delay = 5
+elevator_system = ElevatorSystem(max_floor)
+parameters = (max_floor, spawn_chance, max_people_floor, people_array, winda, winda2, elevators,
+              passengers_at_dest, opening_door_delay, elevator_system)
 
 # Pygame setup
 pygame.init()
@@ -15,7 +35,7 @@ CIRCLE_RADIUS = 15
 ELEVATOR_WIDTH = 40
 ELEVATOR_HEIGHT = FLOOR_HEIGHT - 10
 ELEVATOR_SPACING = 20  # Spacing between elevators
-FPS = 2
+FPS = 30
 
 # Colors
 WHITE = (255, 255, 255)
@@ -83,7 +103,7 @@ def draw_chosen_floors(chosen_floors):
     screen.blit(text, (10, HEIGHT - 30))
 
 
-def main():
+def main(parameters):
     simulation_time = 5000
 
     for step in range(simulation_time):
@@ -94,13 +114,9 @@ def main():
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_UP]:
-            floor_up(winda2)
-
-        if keys[pygame.K_DOWN]:
-            floor_down(winda2)
-
-        operator()
+        parameters = operator(max_floor, spawn_chance, max_people_floor,
+                              people_array, winda, winda2, elevators, passengers_at_dest,
+                              opening_door_delay, elevator_system)
 
         screen.fill(BLACK)
 
@@ -109,7 +125,7 @@ def main():
 
         draw_passengers()
 
-        draw_elevators([winda, winda2])  # Pass a list of current floors for each elevator
+        draw_elevators(elevators)  # Pass a list of current floors for each elevator
 
         draw_chosen_floors(winda.chosen_floors)
 
@@ -123,4 +139,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(parameters)

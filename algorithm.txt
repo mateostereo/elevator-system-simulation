@@ -1,0 +1,10 @@
+Scenario for one elevator:
+
+1. As long as there’s someone inside or ahead of the elevator who wants to go in the current direction, keep heading in that direction.
+2. Once the elevator has exhausted the requests in its current direction, switch directions if there’s a request in the other direction. Otherwise, stop and wait for a call.
+
+
+Scenario for two elevators:
+1. General rule same as for one
+2. The second elevator won't go to the floor if there's no other requests and the first elevator isn't busy
+3. The second elevator will be keen to returning to 0 floor after completing its tasks (it's the most popular floor)
